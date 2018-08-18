@@ -271,7 +271,11 @@ fn get_llvm_cflags() -> String {
         return output;
     }
 
-    llvm_config("--cflags").split(&[' ', '\n'][..])
+    strip_warning_flags(&output)
+}
+
+fn strip_warning_flags(input: &str) -> String {
+    input.split(&[' ', '\n'][..])
         .filter(|word| !word.starts_with("-W"))
         .collect::<Vec<_>>()
         .join(" ")
@@ -309,4 +313,12 @@ fn main() {
     gcc::Build::new()
         .file("wrappers/target.c")
         .compile("targetwrappers");
+
+    std::env::set_var("CXXFLAGS", strip_warning_flags(&llvm_config("--cxxflags")));
+    gcc::Build::new()
+        .cpp(true)
+        .cpp_link_stdlib(None)
+        .warnings(false)
+        .file("wrappers/codegen_linking.cpp")
+        .compile("codegenlinkingwrappers");
 }

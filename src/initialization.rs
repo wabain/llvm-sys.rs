@@ -15,4 +15,12 @@ extern "C" {
     pub fn LLVMInitializeIPA(R: LLVMPassRegistryRef);
     pub fn LLVMInitializeCodeGen(R: LLVMPassRegistryRef);
     pub fn LLVMInitializeTarget(R: LLVMPassRegistryRef);
+
+    /// Function which forces linking of LLVM codegen components which are
+    /// not directly referenced. If this function is not invoked, an
+    /// error like the following might be encountered when invoking a function
+    /// using a standard GC strategy:
+    ///
+    /// LLVM ERROR: unsupported GC: shadow-stack (did you remember to link and initialize the CodeGen library?)
+    pub fn LLVM_InitializeAllCodegenComponents();
 }
